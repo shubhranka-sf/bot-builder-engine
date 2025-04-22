@@ -73,7 +73,9 @@ def train_model(data):
     # Process entities for domain
     entity_names = []
     for entity in data.get("entities", []):
-        entity_obj = {"name": entity["name"]}
+        entity_obj = entity["name"]
+        if entity.get("roles") or entity.get("groups"):
+            entity_obj = {"name": entity["name"]}
         if entity.get("roles"):
             entity_obj["roles"] = entity["roles"]
         if entity.get("groups"):

@@ -29,6 +29,8 @@ def train_model_route():
     data = request.get_json()
     print(f"POST data: {data}")
     response = make_response(train_model(data))
+    global agent
+    agent = None
     return add_cors_headers(response)
 
 @app.route('/health', methods=['GET', 'OPTIONS'])
