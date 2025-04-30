@@ -12,4 +12,4 @@ policies:
 - name: RulePolicy
 - name: TEDPolicy
   epochs: 100
-# assistant_id: 20250408-122216-coped-tiger
+assistant_id: 20250408-122216-coped-tiger
