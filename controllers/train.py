@@ -152,9 +152,9 @@ def train_model(data):
     domain_data["actions"].extend(custom_actions)
     
     # Add form actions to domain
-    for form in data.get("forms", []):
-        if form["name"] not in domain_data["actions"]:
-            domain_data["actions"].append(form["name"])
+    # for form in data.get("forms", []):
+    #     if form["name"] not in domain_data["actions"]:
+    #         domain_data["actions"].append(form["name"])
     
     # Add fallback responses if provided
     if "responses" in data:
@@ -182,9 +182,41 @@ def train_model(data):
                 story_yaml["steps"].append(intent_step)
             elif step["node"] == "action":
                 story_yaml["steps"].append({"action": step["name"]})
+                if "type" in step and step["type"] == "form":
+                    story_yaml["steps"].append({"active_loop": None})
+                    story_yaml["steps"].append({"slot_was_set": [{ "requested_slot": None }]})
+
             elif step["node"] == "slot":
                 story_yaml["steps"].append({"slot_was_set": [{step["name"]: step["value"]}]})
         stories_data["stories"].append(story_yaml)
+
+    # Generate Form Deactivation if form_rules are provided
+    if "form_rules" in data and data["form_rules"]:
+        rules_data = {"version": "3.1", "rules": []}
+        for form_rule in data.get("form_rules", []):
+            rule_yaml = {
+                "rule": form_rule["form"],
+                "condition": [{
+                    "active_loop": form_rule["form"]
+                }],
+                "steps": [
+                    {
+                        "action": form_rule["form"]
+                    }, 
+                    {
+                        "active_loop": None,
+                    },
+                    {
+                        "slot_was_set": [{
+                            "requested_slot": None
+                        }]
+                    },
+                    {
+                        "action": form_rule["next_action"]
+                    }                    
+                ]
+            }
+
     
     # Generate Rules YAML if rules are provided
     if "rules" in data and data["rules"]:

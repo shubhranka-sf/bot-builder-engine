@@ -1,0 +1,240 @@
+File: config.yml
+
+version: "3.1"
+language: en
+pipeline:
+- name: WhitespaceTokenizer
+- name: RegexFeaturizer
+- name: LexicalSyntacticFeaturizer
+- name: CountVectorsFeaturizer
+- name: DIETClassifier
+  epochs: 100
+policies:
+- name: MemoizationPolicy
+- name: RulePolicy
+- name: TEDPolicy
+  epochs: 100
+assistant_id: 20250408-122216-coped-tiger
+
+
+File: ./data/nlu.yml
+
+nlu:
+- examples: '|
+
+    - hello
+
+    - hi
+
+    - hey
+
+    - good morning'
+  intent: intent_greet
+- examples: '|
+
+    - I want to order a [pizza](food_item)
+
+    - buy one [large soda](drink_item)
+
+    - purchase the [special combo](menu_item)
+
+    - can I get a [cheeseburger](food_item)?'
+  intent: intent_order
+- examples: '|
+
+    - support needed
+
+    - I need help with my [order](support_topic)
+
+    - assist me please
+
+    - my name is [Alice](user_name)'
+  intent: intent_support
+- examples: '|
+
+    - bye
+
+    - goodbye
+
+    - see you later
+
+    - take care'
+  intent: intent_goodbye
+- examples: '|
+
+    - shipping cost
+
+    - delivery time to [London](location)
+
+    - track my [shipment](support_topic)'
+  intent: intent_faq_shipping
+- examples: '|
+
+    - return policy
+
+    - exchange process
+
+    - refund status'
+  intent: intent_faq_returns
+- examples: '|
+
+    - My account number is [123456789](account_number)
+
+    - Use phone [9876543210](phone_number)
+
+    - My email is [test@example.com](email_address)
+
+    - account [ACC1001](account_number) and phone [555-1212](phone_number)
+
+    - it is [Bob](user_name) with email [bob@mail.com](email_address)'
+  intent: intent_provide_info
+version: '3.1'
+
+
+File: ./data/stories.yml
+
+stories:
+- steps:
+  - intent: intent_greet
+  - action: form_b34b
+  - active_loop: form_b34b
+  - action: utter_acknowledge_info
+  story: story_atv7
+version: '3.1'
+
+
+File: ./domain.yml
+
+actions:
+- action_check_order_api
+- action_transfer_to_agent
+entities:
+- food_item
+- drink_item
+- menu_item
+- support_topic
+- user_name
+- location
+- account_number
+- phone_number
+- email_address
+forms:
+  form_b34b:
+    required_slots:
+    - account_number
+intents:
+- intent_greet
+- intent_order:
+    use_entities: true
+- intent_support:
+    use_entities: true
+- intent_goodbye
+- intent_faq_shipping:
+    use_entities: true
+- intent_faq_returns
+- intent_provide_info:
+    use_entities: true
+responses:
+  utter_acknowledge_info:
+  - text: Got it, thanks for the details!
+  - text: Okay, I've noted that down.
+  - text: Thanks for providing the information.
+  utter_ask_account_number:
+  - text: What is your account number?
+  utter_ask_email_address:
+  - text: What is your email address?
+  - text: Please provide your email.
+  utter_ask_order_details:
+  - text: Sure, what would you like to order?
+  utter_ask_phone_number:
+  - text: What is your phone number?
+  utter_ask_user_name:
+  - text: What is your name?
+  - text: May I have your name please?
+  utter_goodbye:
+  - text: Goodbye! Have a great day.
+  - text: See you later!
+  - text: Take care!
+  utter_greet_response:
+  - text: Hello there! What can I do for you?
+  - text: Hi! How may I help?
+  - text: Hey, need assistance with anything?
+  utter_shipping_info:
+  - text: Standard shipping takes 3-5 business days.
+session_config:
+  carry_over_slots_to_new_session: true
+  session_expiration_time: 60
+slots:
+  account_number:
+    influence_conversation: true
+    mappings:
+    - entity: account_number
+      type: from_entity
+    type: text
+  drink_item:
+    influence_conversation: true
+    mappings:
+    - entity: drink_item
+      type: from_entity
+    type: text
+  email_address:
+    influence_conversation: true
+    mappings:
+    - entity: email_address
+      type: from_entity
+    type: text
+  food_item:
+    influence_conversation: true
+    mappings:
+    - entity: food_item
+      type: from_entity
+    type: text
+  location:
+    influence_conversation: true
+    mappings:
+    - entity: location
+      type: from_entity
+    type: text
+  menu_item:
+    influence_conversation: true
+    mappings:
+    - entity: menu_item
+      type: from_entity
+    type: text
+  phone_number:
+    influence_conversation: true
+    mappings:
+    - entity: phone_number
+      type: from_entity
+    type: text
+  support_topic:
+    influence_conversation: true
+    mappings:
+    - entity: support_topic
+      type: from_entity
+    type: text
+  user_name:
+    influence_conversation: true
+    mappings:
+    - entity: user_name
+      type: from_entity
+    type: text
+version: '3.1'
+
+
+File: ./data/rules.yml
+
+version: "3.1"
+rules:
+- rule: Submit form
+  condition:
+  - active_loop: form_b34b
+  steps:
+  - action: form_b34b
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: utter_acknowledge_info
+
+I am making a rasa bot builder. I am taking input as json and building the bot. I will ask you some questions to build the bot. 
+
